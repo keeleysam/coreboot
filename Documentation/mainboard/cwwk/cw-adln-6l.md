@@ -81,17 +81,23 @@ firmware describes in its DBG2 table as a memory-mapped 16550. Both are
 routed: `GPP_H10` and `GPP_H11` are in `UART0_RXD` and `UART0_TXD`
 native mode.
 
-Two 2x5 headers at 2.0mm pitch sit near the buzzer. One is silkscreened
-`GPIO1`. The other has a SIPEX SP213EEA beside it, so it carries
+Two 2x5 headers at 2.0mm pitch sit near the buzzer. `GPIO1` breaks out
+the Super I/O GPIO port D. `J_COM` is the serial port, and the vendor
+manual gives it a full 9-wire RS-232 pinout: DCD, RXD, TXD, DTR, GND,
+DSR, RTS, CTS, RI. A SIPEX SP213EEA sits beside it, so `J_COM` carries
 **RS-232 levels, not 3.3V TTL**; do not wire a TTL serial adapter to it.
-Which UART reaches that header has not been measured.
+
+The IT8613E has only one UART, and the modem-control lines on `J_COM`
+point at it rather than at the PCH, so `J_COM` is almost certainly COM1.
+Where PCH UART0 goes is unknown; it is not on either header.
 
 ## Power state after power loss
 
-The rear panel has an `ON` / `OFF` slide switch, wired to the
-`PWRON_AUTO` header on the board, which selects whether the machine
-powers on by itself when mains returns. This is independent of anything
-coreboot configures.
+The rear panel has an `AUTO_ON` slide switch, wired to the `PWRON_AUTO`
+header on the board, which selects whether the machine powers on by
+itself when mains returns. The vendor firmware also has its own
+`PWRON After Power Loss` setup option. How the switch and the PCH
+`AFTERG3_EN` bit interact has not been tested.
 
 ## Functionality
 
@@ -115,11 +121,18 @@ not been run.
 - USB over-current pins are not mapped (`OC_SKIP`). The board wires OC1
 (`GPP_A14`) and OC3 (`GPP_A16`), but which port belongs to which pin has
 not been measured.
+- The internal `F_USB1` header, which the vendor manual documents as
+carrying two USB2 ports, is not enabled. Nothing in software identifies
+which two PCH ports they are: the vendor leaves all twelve enabled and
+its ACPI carries no `_UPC`. Determining them needs a device plugged into
+the header.
 - The PCIe clock source assignment. The board routes seven of the ten
 ADL-N `SRCCLKREQ` signals for eight root ports, and which source belongs
 to which port has not been measured. See the comment in
 `devicetree_6l.cb`.
-- S3 suspend.
+- S3 suspend. The vendor firmware ships with `ACPI Sleep State` set to
+`Suspend Disabled` and its manual states S3 and S4 are not supported, so
+this may not be achievable at all.
 
 ## Specification
 

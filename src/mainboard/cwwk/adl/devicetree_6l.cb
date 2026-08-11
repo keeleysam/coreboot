@@ -39,6 +39,12 @@ chip soc/intel/alderlake
 			# Positions are as seen from the front of the chassis. The
 			# Type-C and the USB3 Type-A are single ports; only the four
 			# USB2 Type-A ports are stacked, in a middle and a right pair.
+			#
+			# The internal F_USB1 header carries two more USB2 ports,
+			# which are not listed here because their port numbers are
+			# unknown. The vendor firmware leaves all twelve enabled and
+			# writes nothing to USB2PDO, and its ACPI has no _UPC, so
+			# nothing in software identifies them.
 			register "usb2_ports" = "{
 				[0] = USB2_PORT_TYPE_C(OC_SKIP),	/* Type-C */
 				[2] = USB2_PORT_SHORT(OC_SKIP),		/* Type-A, right lower */
