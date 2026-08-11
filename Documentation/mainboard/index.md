@@ -78,6 +78,14 @@ CN81XX EVB SFF <cavium/cn8100_sff_evb.md>
 N130WU / N131WU <clevo/n130wu/index.md>
 ```
 
+## CWWK
+
+```{toctree}
+:maxdepth: 1
+
+CW-ADLN-SFP+ <cwwk/cw-adln-sfp.md>
+```
+
 ## Dell
 
 ```{toctree}
