@@ -164,11 +164,24 @@ chip soc/intel/alderlake
 				register "TMPIN2.mode" = "THERMAL_DIODE"
 				register "TMPIN3.mode" = "THERMAL_MODE_DISABLED"
 
+				# TMPIN1 and TMPIN2 are board thermal diodes, not
+				# the CPU. Measured with the machine under load,
+				# TMPIN1 sat at 33C while the CPU package was at
+				# 44C, so the thresholds below are in board terms.
+				#
 				# Curve values are the vendor's own, read from the
 				# Smart Fan Function menu of CWWK's firmware for
 				# the CW-S7 Pro-X550-20G, a sibling board in this
-				# family. tmp_delta is not exposed there; 3C is a
+				# family. Its idle readings, 32C CPU and 26C SYS,
+				# match this board's TMPIN1 and TMPIN2 closely, so
+				# the curve is calibrated for the same sensor.
+				# tmp_delta is not exposed there; 3C is a
 				# conservative hysteresis to stop the fan hunting.
+				#
+				# Note this is a behaviour change: stock firmware
+				# never enables the PWM output, so the fan free
+				# runs at full speed. Under this curve it stops
+				# below 35C.
 				register "FAN1.mode"		= "FAN_SMART_AUTOMATIC"
 				register "FAN1.smart.tmpin"	= "1"
 				register "FAN1.smart.tmp_off"	= "35"

@@ -217,6 +217,13 @@ chip soc/intel/alderlake
 				# the CW-S7 Pro-X550-20G, a sibling board in this
 				# family. tmp_delta is not exposed there; 3C is a
 				# conservative hysteresis to stop the fan hunting.
+				#
+				# Unlike the sibling board, TMPIN1 here is the CPU
+				# temperature over PECI rather than a board diode,
+				# so the same thresholds act on a reading that runs
+				# roughly 10C hotter. That makes the fan respond to
+				# CPU load, which suits a chassis that is otherwise
+				# passively cooled.
 				register "FAN2.mode"		= "FAN_SMART_AUTOMATIC"
 				register "FAN2.smart.tmpin"	= "1"
 				register "FAN2.smart.tmp_off"	= "35"
