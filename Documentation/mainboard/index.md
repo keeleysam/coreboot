@@ -83,6 +83,7 @@ N130WU / N131WU <clevo/n130wu/index.md>
 ```{toctree}
 :maxdepth: 1
 
+CW-ADLN-6L <cwwk/cw-adln-6l.md>
 CW-ADLN-SFP+ <cwwk/cw-adln-sfp.md>
 ```
 
