@@ -55,6 +55,9 @@ config MAINBOARD_VERSION
 config DEVICETREE
 	default "devicetree_sfp.cb"   if BOARD_CWWK_CW_ADLN_SFP
 
+config FMDFILE
+	default "src/mainboard/\$(CONFIG_MAINBOARD_DIR)/board.fmd" if BOARD_CWWK_CW_ADLN_SFP
+
 # The two original variants share one data.vbt; CW-ADLN-SFP+ has its own.
 config INTEL_GMA_VBT_FILE
 	default "src/mainboard/\$(MAINBOARDDIR)/variants/\$(CONFIG_VARIANT_DIR)/data.vbt" if BOARD_CWWK_CW_ADLN_SFP

@@ -1,0 +1,16 @@
+FLASH 16M {
+	# Descriptor, ME and the vendor's Device Expansion 2 region. Never
+	# written by coreboot; only the BIOS region is ever flashed.
+	SI_ALL 6M {
+		SI_DESC		4K
+		SI_ME
+	}
+	# Matches FREG1 in the vendor descriptor: 0x600000-0xffffff.
+	SI_BIOS 10M {
+		RW_MRC_CACHE		64K
+		SMMSTORE		512K
+		RW_ELOG(PRESERVE)	16K
+		FMAP			4K
+		COREBOOT(CBFS)
+	}
+}
