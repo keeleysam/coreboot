@@ -164,30 +164,25 @@ chip soc/intel/alderlake
 				register "TMPIN2.mode" = "THERMAL_DIODE"
 				register "TMPIN3.mode" = "THERMAL_MODE_DISABLED"
 
-				# TMPIN1 and TMPIN2 are board thermal diodes, not
-				# the CPU. Measured with the machine under load,
-				# TMPIN1 sat at 33C while the CPU package was at
-				# 44C, so the thresholds below are in board terms.
+				# TMPIN1 and TMPIN2 are board thermal diodes. TMPIN1
+				# reads about 10C below the CPU package, so the limits
+				# below are board temperatures, not CPU.
 				#
-				# Curve values are the vendor's own, read from the
-				# Smart Fan Function menu of CWWK's firmware for
-				# the CW-S7 Pro-X550-20G, a sibling board in this
-				# family. Its idle readings, 32C CPU and 26C SYS,
-				# match this board's TMPIN1 and TMPIN2 closely, so
-				# the curve is calibrated for the same sensor.
-				# tmp_delta is not exposed there; 3C is a
-				# conservative hysteresis to stop the fan hunting.
+				# Vendor defaults are CWWK's own, taken from the Smart
+				# Fan menu of the CW-S7 Pro-X550-20G, whose idle
+				# readings match this board's TMPIN1 and TMPIN2. Stock
+				# firmware never enables the PWM output at all, so the
+				# fan free runs at full speed.
 				#
-				# Note this is a behaviour change: stock firmware
-				# never enables the PWM output, so the fan free
-				# runs at full speed. Under this curve it stops
-				# below 35C.
+				# tmp_off is dropped to 0 so the fan idles at pwm_start
+				# rather than cycling on and off across the vendor's
+				# 35/45 hysteresis.
 				register "FAN1.mode"		= "FAN_SMART_AUTOMATIC"
 				register "FAN1.smart.tmpin"	= "1"
-				register "FAN1.smart.tmp_off"	= "35"
+				register "FAN1.smart.tmp_off"	= "0"	# Vendor default: 35
 				register "FAN1.smart.tmp_start"	= "45"
 				register "FAN1.smart.tmp_full"	= "90"
-				register "FAN1.smart.tmp_delta"	= "3"
+				register "FAN1.smart.tmp_delta"	= "3"	# Not exposed by vendor
 				register "FAN1.smart.pwm_start"	= "35"
 				register "FAN1.smart.slope"	= "15"
 				register "FAN2.mode"		= "FAN_MODE_OFF"
