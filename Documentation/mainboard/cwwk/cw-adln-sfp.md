@@ -46,6 +46,28 @@ registers cover the descriptor and ME. A full-chip write can still erase
 parts of that range but not program it again, which leaves the reset
 vector blank.
 
+### Returning to vendor firmware
+
+CWWK publishes a bootable UEFI shell ISO containing a complete 16MiB
+image and Intel's `Fpt.efi`, which writes descriptor, ME and BIOS in one
+pass:
+
+```
+Fpt.efi -f <image>.bin
+```
+
+That is the simplest route back to stock, and it needs no external
+programmer. Note the converse: running the vendor updater on a machine
+running coreboot will silently replace it, and will also set the
+descriptor soft straps to the vendor's current values, which differ in
+three bytes from what these boards shipped with.
+
+The vendor image is built on the Twin Lake FSP and covers N100, i3-N305,
+N150 and N355 with a single binary. This coreboot port was developed
+against i3-N305. An N150 or N355 board of the same design would want
+`SOC_INTEL_TWINLAKE`, as `topton/adl` does for its own N150 variant, and
+is untested here.
+
 ### Externally
 
 Vendor populated this board with a Winbond W25Q128.V chip in SOIC-8
