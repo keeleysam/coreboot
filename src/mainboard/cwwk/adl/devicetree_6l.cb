@@ -212,14 +212,19 @@ chip soc/intel/alderlake
 				# populated header, and its tachometer is the only one
 				# that responds.
 				register "FAN1.mode"		= "FAN_MODE_OFF"
+				# Curve values are the vendor's own, read from the
+				# Smart Fan Function menu of CWWK's firmware for
+				# the CW-S7 Pro-X550-20G, a sibling board in this
+				# family. tmp_delta is not exposed there; 3C is a
+				# conservative hysteresis to stop the fan hunting.
 				register "FAN2.mode"		= "FAN_SMART_AUTOMATIC"
 				register "FAN2.smart.tmpin"	= "1"
-				register "FAN2.smart.tmp_off"	= "40"
+				register "FAN2.smart.tmp_off"	= "35"
 				register "FAN2.smart.tmp_start"	= "45"
-				register "FAN2.smart.tmp_full"	= "85"
+				register "FAN2.smart.tmp_full"	= "90"
 				register "FAN2.smart.tmp_delta"	= "3"
-				register "FAN2.smart.pwm_start"	= "30"
-				register "FAN2.smart.slope"	= "8"
+				register "FAN2.smart.pwm_start"	= "35"
+				register "FAN2.smart.slope"	= "15"
 				register "FAN3.mode"		= "FAN_MODE_OFF"
 
 				device pnp 2e.1 on	# COM1

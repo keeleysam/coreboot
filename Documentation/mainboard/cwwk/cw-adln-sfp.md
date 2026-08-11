@@ -103,14 +103,27 @@ a 2x10 header at 2.0mm pitch on the left edge near the SFP+ cages.
 Ordinary 2.54mm IDC cables do not fit.
 
 `JCOM` is driven by a TI MAX3243E, so it carries **RS-232 levels, not
-3.3V TTL**. Do not wire a TTL serial adapter to it. That part has three
-drivers, so the header cannot carry two fully wired ports; which of COM1
-(`0x3f8`) and COM2 (`0x2f8`) appear on it, and on which pins, has not
-been measured.
+3.3V TTL**. Do not wire a TTL serial adapter to it.
 
-Four three-position jumpers sit beside the header, silkscreened `JC13`
-and `JC14`. The vendor does not document them, and they are untested.
-Leave them in their factory positions.
+CWWK documents an identically named header on the CW-S7 Pro-X550-20G, a
+sibling board in this family, and the two boards agree on every header
+name. Assuming the pinout carries over, but **not verified on this
+board**:
+
+```
+ 1 DCD_A    2 RXD_A       11 RXD_B     12 TXD_B
+ 3 TXD_A    4 DTR_A       13 RTS_B     14 CTS_B
+ 5 GND      6 DSR_A       15 n/c       16 n/c
+ 7 RTS_A    8 CTS_A       17 GND       18 GND
+ 9 RI_A    10 n/c         19 PWR_BTN#  20 RESET#
+```
+
+So COM1 appears with full modem control, COM2 with transmit, receive and
+flow control only, and the power and reset buttons share the header.
+
+`JC13` and `JC14` beside it are the RS232/RS485 mode selectors, one per
+port, each a 2x3 with two independent three-pin groups. The factory
+position is RS-232. Leave them there unless you want RS-485.
 
 ## Firmware configuration
 
