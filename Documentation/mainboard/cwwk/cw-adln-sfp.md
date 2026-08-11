@@ -21,7 +21,8 @@ similar name, using different board layout, capabilities and EC/SuperIO.
 
 The board designation is not exposed anywhere in software; SMBIOS reports
 `Default string` for every field. According to the sticker on the board:
-`CW-ADLN-SFP+`.
+`CW-ADLN-SFP+`. The revision is printed underneath the SO-DIMM and reads
+`CW-ADLN-SFP+ v1.3` on the boards this port was developed against.
 
 Please **DO NOT cross-flash firmware on "similar-looking" device**.
 Doing so **may kill your device**.
@@ -75,9 +76,19 @@ CONFIG_EDK2_GOP_FILE="/path/to/IntelGopDriver.efi"
 
 ## Serial console
 
-There is no external serial port. COM1 (`0x3f8`) and COM2 (`0x2f8`) are
-brought out on the 2x10 header at 2.0mm pitch on the left edge of the
-board, near the SFP+ cages. Ordinary 2.54mm IDC cables do not fit.
+There is no external serial port. The board brings serial out on `JCOM`,
+a 2x10 header at 2.0mm pitch on the left edge near the SFP+ cages.
+Ordinary 2.54mm IDC cables do not fit.
+
+`JCOM` is driven by a TI MAX3243E, so it carries **RS-232 levels, not
+3.3V TTL**. Do not wire a TTL serial adapter to it. That part has three
+drivers, so the header cannot carry two fully wired ports; which of COM1
+(`0x3f8`) and COM2 (`0x2f8`) appear on it, and on which pins, has not
+been measured.
+
+Four three-position jumpers sit beside the header, silkscreened `JC13`
+and `JC14`. The vendor does not document them, and they are untested.
+Leave them in their factory positions.
 
 ## Firmware configuration
 
