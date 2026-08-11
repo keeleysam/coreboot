@@ -1,0 +1,11 @@
+chip soc/intel/alderlake
+
+	device domain 0 on
+		device ref igpu		on end
+		device ref crashlog	off end
+		device ref xhci		on end
+		device ref shared_sram	on end
+		device ref pch_espi	on end
+		device ref smbus	on end
+	end
+end
