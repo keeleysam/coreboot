@@ -4,100 +4,105 @@ chip soc/intel/alderlake
 	register "pmc_gpe0_dw1" = "GPP_D"
 	register "pmc_gpe0_dw2" = "GPP_E"
 
-	# USB2 ports, established by plugging an individually identifiable
-	# device into every external port and reading back the topology.
-	# Ports 5, 9, 11 and 12 are not routed anywhere on this board.
-	#
-	# The over-current pins OC1 (GPP_A14) and OC3 (GPP_A16) are wired, but
-	# which port belongs to which pin has not been measured, so no port is
-	# mapped and over-current is not reported to the OS. The hardware
-	# current limiters are unaffected.
-	register "usb2_ports[0]" = "USB2_PORT_MID(OC_SKIP)"	# microSD/TF reader
-	register "usb2_ports[1]" = "USB2_PORT_MID(OC_SKIP)"	# Type-A SuperSpeed, USB2 lane
-	register "usb2_ports[2]" = "USB2_PORT_MID(OC_SKIP)"	# rear pair 3 upper
-	register "usb2_ports[3]" = "USB2_PORT_MID(OC_SKIP)"	# rear pair 3 lower
-	register "usb2_ports[5]" = "USB2_PORT_TYPE_C(OC_SKIP)"	# Type-C, USB2 lane
-	register "usb2_ports[6]" = "USB2_PORT_MID(OC_SKIP)"	# rear pair 2 lower
-	register "usb2_ports[7]" = "USB2_PORT_MID(OC_SKIP)"	# rear pair 2 upper
-	register "usb2_ports[9]" = "USB2_PORT_MID(OC_SKIP)"	# CNVi Bluetooth
-
-	# The PCH SuperSpeed ports are unused; every SuperSpeed-capable
-	# connector on this board is fed from the TCSS controller instead.
-	register "tcss_ports[0]" = "TCSS_PORT_DEFAULT(OC_SKIP)"	# Type-A SuperSpeed
-	register "tcss_ports[1]" = "TCSS_PORT_DEFAULT(OC_SKIP)"	# Type-C
-
-	# Five endpoints against the five Alder Lake-N clock sources, so no
-	# sharing is required. Clock source 0 belongs to the M.2 E-key slot:
-	# GPP_D5 (SRCCLKREQ0#) drops to a plain GPIO on a unit whose E-key
-	# holds a CNVi card rather than an NVMe.
-	register "pch_pcie_rp[PCH_RP(1)]" = "{
-		.clk_src = 1,
-		.clk_req = 1,
-		.flags = PCIE_RP_AER | PCIE_RP_CLK_REQ_DETECT | PCIE_RP_BUILT_IN,
-		.pcie_rp_aspm = ASPM_L0S,
-	}"
-
-	register "pch_pcie_rp[PCH_RP(7)]" = "{
-		.clk_src = 2,
-		.clk_req = 2,
-		.flags = PCIE_RP_AER | PCIE_RP_CLK_REQ_DETECT | PCIE_RP_BUILT_IN,
-		.pcie_rp_aspm = ASPM_L0S,
-	}"
-
-	register "pch_pcie_rp[PCH_RP(9)]" = "{
-		.clk_src = 3,
-		.clk_req = 3,
-		.flags = PCIE_RP_AER | PCIE_RP_CLK_REQ_DETECT | PCIE_RP_BUILT_IN,
-		.pcie_rp_aspm = ASPM_L0S,
-	}"
-
-	register "pch_pcie_rp[PCH_RP(10)]" = "{
-		.clk_src = 0,
-		.clk_req = 0,
-		.flags = PCIE_RP_AER | PCIE_RP_CLK_REQ_DETECT,
-	}"
-
-	register "pch_pcie_rp[PCH_RP(12)]" = "{
-		.clk_src = 4,
-		.clk_req = 4,
-		.flags = PCIE_RP_AER | PCIE_RP_CLK_REQ_DETECT,
-	}"
-
-	# Two HDMI outputs, both with hotplug detect and DDC. DDI port A is the
-	# upper connector. There is no DisplayPort on this board, and the
-	# Type-C port does not carry DisplayPort alt mode.
-	register "ddi_ports_config" = "{
-		[DDI_PORT_A] = DDI_ENABLE_HPD | DDI_ENABLE_DDC,
-		[DDI_PORT_B] = DDI_ENABLE_HPD | DDI_ENABLE_DDC,
-	}"
-
 	device domain 0 on
-		device ref igpu		on end
+		device ref igpu on
+			register "ddi_ports_config" = "{
+				[DDI_PORT_A] = DDI_ENABLE_HPD | DDI_ENABLE_DDC,
+				[DDI_PORT_B] = DDI_ENABLE_HPD | DDI_ENABLE_DDC,
+			}"
+		end
 		device ref crashlog	off end
-		device ref tcss_xhci	on
+
+		device ref tcss_xhci on
+			register "tcss_ports" = "{
+				[0] = TCSS_PORT_DEFAULT(OC_SKIP),
+				[1] = TCSS_PORT_DEFAULT(OC_SKIP),
+			}"
 			chip drivers/usb/acpi
 				device ref tcss_root_hub on
 					chip drivers/usb/acpi
-						register "desc" = ""Type-A SuperSpeed""
+						register "desc" = ""USB3 Type-A""
 						register "type" = "UPC_TYPE_USB3_A"
 						device ref tcss_usb3_port1 on end
 					end
 					chip drivers/usb/acpi
-						register "desc" = ""Type-C""
+						register "desc" = ""USB3 Type-C""
 						register "type" = "UPC_TYPE_C_USB2_SS_SWITCH"
 						device ref tcss_usb3_port2 on end
 					end
 				end
 			end
 		end
-		device ref xhci		on end
+
+		device ref xhci on
+			register "usb2_ports" = "{
+				[0] = USB2_PORT_SHORT(OC_SKIP),		/* microSD card reader */
+				[1] = USB2_PORT_SHORT(OC_SKIP),		/* Type-A SuperSpeed */
+				[2] = USB2_PORT_SHORT(OC_SKIP),		/* Rear USB2, upper */
+				[3] = USB2_PORT_SHORT(OC_SKIP),		/* Rear USB2, lower */
+				[5] = USB2_PORT_TYPE_C(OC_SKIP),	/* Type-C */
+				[6] = USB2_PORT_SHORT(OC_SKIP),		/* Rear USB2, lower */
+				[7] = USB2_PORT_SHORT(OC_SKIP),		/* Rear USB2, upper */
+				[9] = USB2_PORT_SHORT(OC_SKIP),		/* CNVi Bluetooth */
+			}"
+			chip drivers/usb/acpi
+				device ref xhci_root_hub on
+					chip drivers/usb/acpi
+						register "desc" = ""microSD Card Reader""
+						register "type" = "UPC_TYPE_INTERNAL"
+						device ref usb2_port1 on end
+					end
+					chip drivers/usb/acpi
+						register "desc" = ""USB2 Type-A SuperSpeed""
+						register "type" = "UPC_TYPE_USB3_A"
+						device ref usb2_port2 on end
+					end
+					chip drivers/usb/acpi
+						register "desc" = ""USB2 Rear Upper""
+						register "type" = "UPC_TYPE_A"
+						device ref usb2_port3 on end
+					end
+					chip drivers/usb/acpi
+						register "desc" = ""USB2 Rear Lower""
+						register "type" = "UPC_TYPE_A"
+						device ref usb2_port4 on end
+					end
+					chip drivers/usb/acpi
+						register "desc" = ""USB2 Type-C""
+						register "type" = "UPC_TYPE_C_USB2_SS_SWITCH"
+						device ref usb2_port6 on end
+					end
+					chip drivers/usb/acpi
+						register "desc" = ""USB2 Rear Lower""
+						register "type" = "UPC_TYPE_A"
+						device ref usb2_port7 on end
+					end
+					chip drivers/usb/acpi
+						register "desc" = ""USB2 Rear Upper""
+						register "type" = "UPC_TYPE_A"
+						device ref usb2_port8 on end
+					end
+					chip drivers/usb/acpi
+						register "desc" = ""CNVi Bluetooth""
+						register "type" = "UPC_TYPE_INTERNAL"
+						device ref usb2_port10 on end
+					end
+				end
+			end
+		end
+
 		device ref shared_sram	on end
 		device ref cnvi_wifi	on end
 		device ref heci1	on end
 		device ref sata		on end
 
-		# 82599ES dual-port 10G SFP+. Soldered, so no slot descriptor.
-		device ref pcie_rp1 on
+		device ref pcie_rp1 on	# 82599ES dual-port 10G SFP+
+			register "pch_pcie_rp[PCH_RP(1)]" = "{
+				.clk_src = 1,
+				.clk_req = 1,
+				.flags = PCIE_RP_AER | PCIE_RP_CLK_REQ_DETECT | PCIE_RP_BUILT_IN,
+				.pcie_rp_aspm = ASPM_L0S,
+			}"
 			device pci 00.0 on
 				smbios_dev_info 0 "SFP+1"
 			end
@@ -106,27 +111,45 @@ chip soc/intel/alderlake
 			end
 		end
 
-		device ref pcie_rp7 on
+		device ref pcie_rp7 on	# i226-V, ETH0
+			register "pch_pcie_rp[PCH_RP(7)]" = "{
+				.clk_src = 2,
+				.clk_req = 2,
+				.flags = PCIE_RP_AER | PCIE_RP_CLK_REQ_DETECT | PCIE_RP_BUILT_IN,
+				.pcie_rp_aspm = ASPM_L0S,
+			}"
 			device pci 00.0 on
 				smbios_dev_info 2 "ETH0"
 			end
 		end
 
-		device ref pcie_rp9 on
+		device ref pcie_rp9 on	# i226-V, ETH1
+			register "pch_pcie_rp[PCH_RP(9)]" = "{
+				.clk_src = 3,
+				.clk_req = 3,
+				.flags = PCIE_RP_AER | PCIE_RP_CLK_REQ_DETECT | PCIE_RP_BUILT_IN,
+				.pcie_rp_aspm = ASPM_L0S,
+			}"
 			device pci 00.0 on
 				smbios_dev_info 3 "ETH1"
 			end
 		end
 
-		# M.2 E-key, silkscreened "M.2 WIFI". Wired for both PCIe and
-		# CNVi; CWWK ship an adapter that turns it into a second 2280
-		# M-key slot.
-		device ref pcie_rp10 on
+		device ref pcie_rp10 on	# M.2 E key, PCIe and CNVi
+			register "pch_pcie_rp[PCH_RP(10)]" = "{
+				.clk_src = 0,
+				.clk_req = 0,
+				.flags = PCIE_RP_AER | PCIE_RP_CLK_REQ_DETECT,
+			}"
 			smbios_slot_desc "SlotTypeM2Socket1_SD" "SlotLengthOther" "M.2/E 2230 (CNVi WiFi)" "SlotDataBusWidth1X"
 		end
 
-		# M.2 M-key 2280 on the underside of the board.
-		device ref pcie_rp12 on
+		device ref pcie_rp12 on	# M.2 M key 2280
+			register "pch_pcie_rp[PCH_RP(12)]" = "{
+				.clk_src = 4,
+				.clk_req = 4,
+				.flags = PCIE_RP_AER | PCIE_RP_CLK_REQ_DETECT,
+			}"
 			smbios_slot_desc "SlotTypeM2Socket3" "SlotLengthOther" "M.2/M 2280 (NVMe)" "SlotDataBusWidth1X"
 		end
 
@@ -140,10 +163,6 @@ chip soc/intel/alderlake
 				register "TMPIN2.mode" = "THERMAL_DIODE"
 				register "TMPIN3.mode" = "THERMAL_MODE_DISABLED"
 
-				# Chassis fan. The vendor firmware leaves this in
-				# software PWM mode at full duty with SmartGuardian
-				# disabled, so it runs at 100% permanently. Regulate
-				# it against the CPU temperature instead.
 				register "FAN1.mode"		= "FAN_SMART_AUTOMATIC"
 				register "FAN1.smart.tmpin"	= "1"
 				register "FAN1.smart.tmp_off"	= "40"
@@ -169,12 +188,7 @@ chip soc/intel/alderlake
 				device pnp 2e.4 on	# Environment controller
 					io 0x60 = 0x0a20
 					io 0x62 = 0x0a10
-					# Deliberately no ISA IRQ. The hardware
-					# monitor powers up on IRQ 9, which is the
-					# ACPI SCI, and an idle fan header then
-					# drives it continuously with no status bit
-					# for the OS to acknowledge. The vendor
-					# firmware also leaves this at zero.
+					# No ISA IRQ; the HWM defaults to the ACPI SCI
 					irq 0x70 = 0x00
 				end
 				device pnp 2e.5 off end	# PS/2 keyboard
