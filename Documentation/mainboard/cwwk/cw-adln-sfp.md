@@ -105,10 +105,7 @@ Ordinary 2.54mm IDC cables do not fit.
 `JCOM` is driven by a TI MAX3243E, so it carries **RS-232 levels, not
 3.3V TTL**. Do not wire a TTL serial adapter to it.
 
-CWWK documents an identically named header on the CW-S7 Pro-X550-20G, a
-sibling board in this family, and the two boards agree on every header
-name. Assuming the pinout carries over, but **not verified on this
-board**:
+CWWK's motherboard specification for this board gives the pinout:
 
 ```
  1 DCD_A    2 RXD_A       11 RXD_B     12 TXD_B
@@ -120,6 +117,8 @@ board**:
 
 So COM1 appears with full modem control, COM2 with transmit, receive and
 flow control only, and the power and reset buttons share the header.
+The vendor prints pins 11 and 12 both as `SOUT_B_J`; 11 is receive, by
+symmetry with the A port.
 
 `JC13` and `JC14` beside it are the RS232/RS485 mode selectors, one per
 port, each a 2x3 with two independent three-pin groups. The factory
@@ -149,8 +148,9 @@ state to restore after a power loss (CFR `power_on_after_fail`).
 - USB over-current pins are not mapped (`OC_SKIP`). The board wires OC1
 (`GPP_A14`) and OC3 (`GPP_A16`), but which port belongs to which pin has
 not been measured.
-- Audio. The ALC897 verb table is derived from the vendor firmware but
-the jack has not been tested.
+- Audio. The board has a combined MIC and line-out jack driven by the
+ALC897, and the verb table is derived from the vendor firmware, but the
+jack has not been tested.
 - S3 suspend.
 
 ## Specification

@@ -177,6 +177,11 @@ chip soc/intel/alderlake
 				# tmp_off is dropped to 0 so the fan idles at pwm_start
 				# rather than cycling on and off across the vendor's
 				# 35/45 hysteresis.
+				#
+				# The board has two CPU-FAN headers, on FAN1 and
+				# FAN2, and the vendor enables the tachometer on
+				# both. Configure them alike so either works. FAN3
+				# has no header.
 				register "FAN1.mode"		= "FAN_SMART_AUTOMATIC"
 				register "FAN1.smart.tmpin"	= "1"
 				register "FAN1.smart.tmp_off"	= "0"	# Vendor default: 35
@@ -185,7 +190,14 @@ chip soc/intel/alderlake
 				register "FAN1.smart.tmp_delta"	= "3"	# Not exposed by vendor
 				register "FAN1.smart.pwm_start"	= "35"
 				register "FAN1.smart.slope"	= "15"
-				register "FAN2.mode"		= "FAN_MODE_OFF"
+				register "FAN2.mode"		= "FAN_SMART_AUTOMATIC"
+				register "FAN2.smart.tmpin"	= "1"
+				register "FAN2.smart.tmp_off"	= "0"	# Vendor default: 35
+				register "FAN2.smart.tmp_start"	= "45"
+				register "FAN2.smart.tmp_full"	= "90"
+				register "FAN2.smart.tmp_delta"	= "3"	# Not exposed by vendor
+				register "FAN2.smart.pwm_start"	= "35"
+				register "FAN2.smart.slope"	= "15"
 				register "FAN3.mode"		= "FAN_MODE_OFF"
 
 				device pnp 2e.1 on	# COM1
