@@ -102,8 +102,10 @@ There is no external serial port. The board brings serial out on `JCOM`,
 a 2x10 header at 2.0mm pitch on the left edge near the SFP+ cages.
 Ordinary 2.54mm IDC cables do not fit.
 
-`JCOM` is driven by a TI MAX3243E, so it carries **RS-232 levels, not
-3.3V TTL**. Do not wire a TTL serial adapter to it.
+`JCOM` is driven by two RS-232 transceivers, a TI MAX3243E and a UTC
+UT3243AG, one per port. It therefore carries **RS-232 levels, not 3.3V
+TTL**; do not wire a TTL serial adapter to it. The UT3243 is rated
+235kbps, so do not expect a console above 230400 baud.
 
 CWWK's motherboard specification for this board gives the pinout:
 
