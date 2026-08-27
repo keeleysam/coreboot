@@ -1,0 +1,153 @@
+chip soc/intel/alderlake
+
+	register "sagv" = "SaGv_Enabled"
+	register "tcc_offset" = "10"
+
+	register "pmc_gpe0_dw0" = "GPP_B"
+	register "pmc_gpe0_dw1" = "GPP_D"
+	register "pmc_gpe0_dw2" = "GPP_E"
+
+	device domain 0 on
+		device ref igpu on
+			register "ddi_portA_config" = "1"	# HDMI
+			register "ddi_portB_config" = "1"	# DP
+			register "ddi_ports_config" = "{
+				[DDI_PORT_A] = DDI_ENABLE_HPD | DDI_ENABLE_DDC,
+				[DDI_PORT_B] = DDI_ENABLE_HPD | DDI_ENABLE_DDC,
+			}"
+		end
+
+		# SuperSpeed for both front USB 3.0 receptacles comes from the
+		# TCSS controller, not the PCH. The PCH's own four SuperSpeed
+		# ports are unrouted on this board.
+		device ref tcss_xhci on
+			chip drivers/usb/acpi
+				device ref tcss_root_hub on
+					chip drivers/usb/acpi
+						device ref tcss_usb3_port1 on end	# front USB3 upper
+					end
+					chip drivers/usb/acpi
+						device ref tcss_usb3_port2 on end	# front USB3 lower
+					end
+				end
+			end
+		end
+
+		device ref xhci on
+			# Port numbering measured by enumerating known devices and
+			# reading busnum/devpath. HS 9 through 12 are unrouted.
+			register "usb2_ports" = "{
+				[0] = USB2_PORT_MID(OC_SKIP),	/* M2_5G slot (unverified) */
+				[1] = USB2_PORT_MID(OC_SKIP),	/* front USB3 lower, USB2 pins */
+				[2] = USB2_PORT_MID(OC_SKIP),	/* front USB2 lower right */
+				[3] = USB2_PORT_MID(OC_SKIP),	/* front USB2 lower left */
+				[4] = USB2_PORT_MID(OC_SKIP),	/* front USB3 upper, USB2 pins */
+				[5] = USB2_PORT_MID(OC_SKIP),	/* mPCIe slot */
+				[6] = USB2_PORT_MID(OC_SKIP),	/* front USB2 upper right */
+				[7] = USB2_PORT_MID(OC_SKIP),	/* front USB2 upper left */
+			}"
+		end
+
+		device ref shared_sram on end
+
+		# SATA port 0 is the SATA half of the M.2 Key-M 2280 combo slot,
+		# port 1 the SATA1 connector. The firmware reports port 0 only
+		# when an M.2 SATA device is fitted; with an NVMe in the slot the
+		# stock firmware reports a port mask of 0x2.
+		device ref sata on
+			register "sata_ports_enable" = "{
+				[0] = 1,
+				[1] = 1,
+			}"
+		end
+
+		# 4x Intel I226-V, eth0 through eth3 in silkscreen order
+		device ref pcie_rp1 on
+			register "pch_pcie_rp[PCH_RP(1)]" = "{
+				.clk_src = 4,
+				.clk_req = 4,
+				.flags = PCIE_RP_CLK_REQ_DETECT | PCIE_RP_BUILT_IN,
+			}"
+		end
+
+		device ref pcie_rp2 on
+			register "pch_pcie_rp[PCH_RP(2)]" = "{
+				.clk_src = 2,
+				.clk_req = 2,
+				.flags = PCIE_RP_CLK_REQ_DETECT | PCIE_RP_BUILT_IN,
+			}"
+		end
+
+		device ref pcie_rp3 on
+			register "pch_pcie_rp[PCH_RP(3)]" = "{
+				.clk_src = 1,
+				.clk_req = 1,
+				.flags = PCIE_RP_CLK_REQ_DETECT | PCIE_RP_BUILT_IN,
+			}"
+		end
+
+		device ref pcie_rp7 on
+			register "pch_pcie_rp[PCH_RP(7)]" = "{
+				.clk_src = 3,
+				.clk_req = 3,
+				.flags = PCIE_RP_CLK_REQ_DETECT | PCIE_RP_BUILT_IN,
+			}"
+		end
+
+		# M.2 Key-M 2280, PCIe half of the combo slot (Gen3 x2)
+		device ref pcie_rp9 on
+			register "pch_pcie_rp[PCH_RP(9)]" = "{
+				.clk_src = 0,
+				.clk_req = 0,
+				.flags = PCIE_RP_CLK_REQ_DETECT,
+			}"
+		end
+
+		# mPCIe, silkscreened WIFI/4G. PCIe x1 plus USB 2.0 on HS 6.
+		device ref pcie_rp11 on
+			register "pch_pcie_rp[PCH_RP(11)]" = "{
+				.clk_src = 5,
+				.clk_req = 5,
+				.flags = PCIE_RP_CLK_REQ_DETECT,
+			}"
+		end
+
+		device ref pch_espi on
+			chip superio/ite/it8625e
+				# The environment controller is deliberately left
+				# without an interrupt. It powers up on IRQ 9, the
+				# ACPI SCI, and the stock firmware also leaves it
+				# detached.
+				device pnp 2e.4 on		# Environment controller
+					io 0x60 = 0x0a20
+					io 0x62 = 0x0a10
+					irq 0x70 = 0x00
+				end
+				device pnp 2e.1 on		# COM1, front RJ45 console
+					io 0x60 = 0x3f8
+					irq 0x70 = 0x04
+					irq 0xf0 = 0x01
+				end
+				device pnp 2e.2 on		# COM2, J_COM header
+					io 0x60 = 0x2f8
+					irq 0x70 = 0x03
+					irq 0xf0 = 0x01
+				end
+			end
+		end
+
+		device ref smbus on end
+		device ref fast_spi on end
+
+		device ref hda on
+			register "pch_hda_audio_link_hda_enable"	= "true"
+			register "pch_hda_idisp_codec_enable"	= "true"
+			register "pch_hda_idisp_link_frequency"	= "HDA_LINKFREQ_96MHZ"
+			register "pch_hda_idisp_link_tmode"	= "HDA_TMODE_8T"
+		end
+
+		chip drivers/crb
+			device mmio 0xfed40000 on end
+		end
+	end
+end

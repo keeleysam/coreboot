@@ -1,0 +1,15 @@
+# Matches the descriptor found on this board: 4 KiB flash descriptor, an Intel
+# ME region ending at 0x413fff, and a 10 MiB BIOS region based at 0x600000.
+# Read back with `ifdtool -f` from a full-chip dump of the stock firmware.
+FLASH 16M {
+	SI_ALL 6M {
+		SI_DESC		4K
+		SI_ME
+	}
+	SI_BIOS 10M {
+		RW_MRC_CACHE	64K
+		SMMSTORE	512K
+		FMAP		4K
+		COREBOOT(CBFS)
+	}
+}

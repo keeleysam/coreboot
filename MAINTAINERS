@@ -230,6 +230,13 @@ F:	src/mainboard/biostar/
 
 
 
+BKHD MAINBOARDS
+M:	Samuel Keeley <samuel@keeley.net>
+S:	Maintained
+F:	src/mainboard/bkhd/
+
+
+
 BOSTENTECH MAINBOARDS
 S:	Orphan
 F:	src/mainboard/bostentech/

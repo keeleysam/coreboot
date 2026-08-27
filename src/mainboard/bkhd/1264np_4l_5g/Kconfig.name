@@ -1,0 +1,2 @@
+config BOARD_BKHD_1264NP_4L_5G
+	bool "1264NP-4L-5G"

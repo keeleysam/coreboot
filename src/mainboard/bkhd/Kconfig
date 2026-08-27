@@ -1,0 +1,17 @@
+## SPDX-License-Identifier: GPL-2.0-or-later
+
+if VENDOR_BKHD
+
+choice
+	prompt "Mainboard model"
+
+source "src/mainboard/bkhd/*/Kconfig.name"
+
+endchoice
+
+source "src/mainboard/bkhd/*/Kconfig"
+
+config MAINBOARD_VENDOR
+	default "BKHD"
+
+endif # VENDOR_BKHD

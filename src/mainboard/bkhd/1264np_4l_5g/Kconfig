@@ -1,0 +1,34 @@
+## SPDX-License-Identifier: GPL-2.0-or-later
+
+if BOARD_BKHD_1264NP_4L_5G
+
+config BOARD_SPECIFIC_OPTIONS
+	def_bool y
+	select BOARD_ROMSIZE_KB_16384
+	select CRB_TPM
+	select DRIVERS_UART_8250IO
+	select FSP_TYPE_IOT
+	select HAVE_ACPI_RESUME
+	select HAVE_ACPI_TABLES
+	select HAVE_INTEL_PTT
+	select MAINBOARD_HAS_TPM2
+	select SOC_INTEL_ALDERLAKE_PCH_N
+	select SOC_INTEL_COMMON_BLOCK_HDA_VERB
+	select SUPERIO_ITE_IT8625E
+
+config MAINBOARD_DIR
+	default "bkhd/1264np_4l_5g"
+
+config MAINBOARD_PART_NUMBER
+	default "1264NP-4L-5G"
+
+config FMDFILE
+	default "src/mainboard/\$(CONFIG_MAINBOARD_DIR)/board.fmd"
+
+# Graphics is deliberately left unconfigured. Every Alder Lake FSP in
+# 3rdparty/fsp, IoT and Client alike, ships without a GOP driver, so
+# RUN_FSP_GOP cannot produce a picture on this platform, and libgfxinit has no
+# Alder Lake support yet. INTEL_GMA_HAVE_VBT is not selected because no VBT has
+# been captured from this board. The OS driver brings up HDMI and DP normally.
+
+endif # BOARD_BKHD_1264NP_4L_5G

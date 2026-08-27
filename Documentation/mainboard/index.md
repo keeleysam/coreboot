@@ -62,6 +62,14 @@ wifigo_v1 <asus/wifigo_v1.md>
 PRIME H610M-K D4 <asus/h610m-k.md>
 ```
 
+## BKHD
+
+```{toctree}
+:maxdepth: 1
+
+1264NP-4L-5G <bkhd/1264np_4l_5g.md>
+```
+
 ## Cavium
 
 ```{toctree}
